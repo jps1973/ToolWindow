@@ -7,6 +7,8 @@
 
 #include "Resource.h"
 
+#include "RegistryKeyClass.h"
+
 #define MAIN_WINDOW_CLASS_NAME													"Main ToolWindow Window Class"
 
 #define MAIN_WINDOW_CLASS_STYLE													0
@@ -22,6 +24,9 @@
 
 #define MAIN_WINDOW_MINIMUM_WIDTH												320
 #define MAIN_WINDOW_MINIMUM_HEIGHT												200
+
+#define REGISTRY_KEY															HKEY_CURRENT_USER
+#define REGISTRY_SUB_KEY														"Software\\Jim Smith\\Shortcut"
 
 #define ABOUT_MESSAGE_TEXT														"ToolWindow\r\n"					\
 																				"\r\n"								\

@@ -8,6 +8,7 @@ g++ -mwindows -m64 -static -Wall -Wextra ^
  ^
  ToolWindow.cpp ^
  ^
+ RegistryKeyClass.cpp ^
  ^
  Resource.o ^
  ^

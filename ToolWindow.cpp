@@ -34,6 +34,50 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 	// Select message
 	switch( uMessage )
 	{
+		case WM_SIZE:
+		{
+			// A size message
+			RegistryKey registryKey;
+
+			// Create registry key
+			if( registryKey.Create( REGISTRY_KEY, REGISTRY_SUB_KEY ) )
+			{
+				// Successfully created registry key
+
+				// Store window position
+				registryKey.StoreWindowPosition( hWndMain );
+
+				// Close registry key
+				registryKey.Close();
+
+			} // End of successfully created registry key
+
+			// Break out of switch
+			break;
+
+		} // End of a size message
+		case WM_MOVE:
+		{
+			// A move message
+			RegistryKey registryKey;
+
+			// Create registry key
+			if( registryKey.Create( REGISTRY_KEY, REGISTRY_SUB_KEY ) )
+			{
+				// Successfully created registry key
+
+				// Store window position
+				registryKey.StoreWindowPosition( hWndMain );
+
+				// Close registry key
+				registryKey.Close();
+
+			} // End of successfully created registry key
+
+			// Break out of switch
+			break;
+
+		} // End of a move message
 		case WM_GETMINMAXINFO:
 		{
 			// A get min max info message
@@ -170,9 +214,41 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 	{
 		// Successfully registered main window class
 		HWND hWndMain;
+		DWORD dwWindowLeft;
+		DWORD dwWindowTop;
+		DWORD dwWindowWidth;
+		DWORD dwWindowHeight;
+		RegistryKey registryKey;
+
+		// Open registry key
+		if( registryKey.Open( REGISTRY_KEY, REGISTRY_SUB_KEY ) )
+		{
+			// Successfully opened registry key
+
+			// Get window position
+			dwWindowLeft	= registryKey.GetValue( REGISTRY_KEY_LEFT_VALUE_NAME,	CW_USEDEFAULT );
+			dwWindowTop		= registryKey.GetValue( REGISTRY_KEY_TOP_VALUE_NAME,	CW_USEDEFAULT );
+			dwWindowWidth	= registryKey.GetValue( REGISTRY_KEY_WIDTH_VALUE_NAME,	CW_USEDEFAULT );
+			dwWindowHeight	= registryKey.GetValue( REGISTRY_KEY_HEIGHT_VALUE_NAME,	CW_USEDEFAULT );
+
+			// Close registry key
+			registryKey.Close();
+
+		} // End of successfully opened registry key
+		else
+		{
+			// Unable to open registry key
+
+			// Use default window positions
+			dwWindowLeft	= CW_USEDEFAULT;
+			dwWindowTop		= CW_USEDEFAULT;
+			dwWindowWidth	= CW_USEDEFAULT;
+			dwWindowHeight	= CW_USEDEFAULT;
+
+		} // End of unable to open registry key
 
 		// Create main window
-		hWndMain = CreateWindowEx( MAIN_WINDOW_EXTENDED_STYLE, MAIN_WINDOW_CLASS_NAME, MAIN_WINDOW_TEXT, MAIN_WINDOW_STYLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL );
+		hWndMain = CreateWindowEx( MAIN_WINDOW_EXTENDED_STYLE, MAIN_WINDOW_CLASS_NAME, MAIN_WINDOW_TEXT, MAIN_WINDOW_STYLE, dwWindowLeft, dwWindowTop, dwWindowWidth, dwWindowHeight, NULL, NULL, hInstance, NULL );
 
 		// Ensure that main window was created
 		if( hWndMain )
