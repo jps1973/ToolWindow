@@ -190,107 +190,127 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 {
 	MSG msg;
 
-	WNDCLASSEX wcMain;
+	HWND hWndExisting;
 
-	// Clear message structure
-	ZeroMemory( &msg, sizeof( msg ) );
+	// Attempt to find existing instance of window
+	hWndExisting = FindWindow( MAIN_WINDOW_CLASS_NAME, MAIN_WINDOW_TEXT );
 
-	// Clear main window class structure structure
-	ZeroMemory( &wcMain, sizeof( wcMain ) );
-
-	// Initialise main window class structure structure
-	wcMain.cbSize			= sizeof( WNDCLASSEX );
-	wcMain.lpfnWndProc		= MainWindowProcedure;
-	wcMain.hInstance		= hInstance;
-	wcMain.style			= MAIN_WINDOW_CLASS_STYLE;
-	wcMain.hIcon			= MAIN_WINDOW_CLASS_ICON;
-	wcMain.hCursor			= MAIN_WINDOW_CLASS_CURSOR;
-	wcMain.hbrBackground	= MAIN_WINDOW_CLASS_BACKGROUND;
-	wcMain.lpszClassName	= MAIN_WINDOW_CLASS_NAME;
-	wcMain.hIconSm			= MAIN_WINDOW_CLASS_ICON;
-
-	// Register main window class
-	if( RegisterClassEx( &wcMain ) )
+	// See if existing instance of window was found
+	if( hWndExisting )
 	{
-		// Successfully registered main window class
-		HWND hWndMain;
-		DWORD dwWindowLeft;
-		DWORD dwWindowTop;
-		DWORD dwWindowWidth;
-		DWORD dwWindowHeight;
-		RegistryKey registryKey;
+		// Successfully found existing instance of window
 
-		// Open registry key
-		if( registryKey.Open( REGISTRY_KEY, REGISTRY_SUB_KEY ) )
-		{
-			// Successfully opened registry key
+		// Activate existing instance of window
+		SetForegroundWindow( hWndExisting );
 
-			// Get window position
-			dwWindowLeft	= registryKey.GetValue( REGISTRY_KEY_LEFT_VALUE_NAME,	CW_USEDEFAULT );
-			dwWindowTop		= registryKey.GetValue( REGISTRY_KEY_TOP_VALUE_NAME,	CW_USEDEFAULT );
-			dwWindowWidth	= registryKey.GetValue( REGISTRY_KEY_WIDTH_VALUE_NAME,	CW_USEDEFAULT );
-			dwWindowHeight	= registryKey.GetValue( REGISTRY_KEY_HEIGHT_VALUE_NAME,	CW_USEDEFAULT );
-
-			// Close registry key
-			registryKey.Close();
-
-		} // End of successfully opened registry key
-		else
-		{
-			// Unable to open registry key
-
-			// Use default window positions
-			dwWindowLeft	= CW_USEDEFAULT;
-			dwWindowTop		= CW_USEDEFAULT;
-			dwWindowWidth	= CW_USEDEFAULT;
-			dwWindowHeight	= CW_USEDEFAULT;
-
-		} // End of unable to open registry key
-
-		// Create main window
-		hWndMain = CreateWindowEx( MAIN_WINDOW_EXTENDED_STYLE, MAIN_WINDOW_CLASS_NAME, MAIN_WINDOW_TEXT, MAIN_WINDOW_STYLE, dwWindowLeft, dwWindowTop, dwWindowWidth, dwWindowHeight, NULL, NULL, hInstance, NULL );
-
-		// Ensure that main window was created
-		if( hWndMain )
-		{
-			// Successfully created main window
-
-			// Show main window
-			ShowWindow( hWndMain, nCmdShow );
-
-			// Update main window
-			UpdateWindow( hWndMain );
-
-			// Message loop
-			while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
-			{
-				// Translate message
-				TranslateMessage( &msg );
-
-				// Dispatch message
-				DispatchMessage( &msg );
-
-			}; // End of message loop
-
-		} // End of successfully created main window
-		else
-		{
-			// Unable to create main window
-
-			// Display error message
-			MessageBox( NULL, UNABLE_TO_CREATE_MAIN_WINDOW_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
-
-		} // End of unable to create main window
-
-	} // End of successfully registered main window class
+	} // End of successfully found existing instance of window
 	else
 	{
-		// Unable to register main window class
+		// Unable to find existing instance of window
 
-		// Display error message
-		MessageBox( NULL, UNABLE_TO_REGISTER_MAIN_WINDOW_CLASS_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+		// Clear message structure
+		ZeroMemory( &msg, sizeof( msg ) );
 
-	} // End of unable to register main window class
+		WNDCLASSEX wcMain;
+
+		// Clear main window class structure structure
+		ZeroMemory( &wcMain, sizeof( wcMain ) );
+
+		// Initialise main window class structure structure
+		wcMain.cbSize			= sizeof( WNDCLASSEX );
+		wcMain.lpfnWndProc		= MainWindowProcedure;
+		wcMain.hInstance		= hInstance;
+		wcMain.style			= MAIN_WINDOW_CLASS_STYLE;
+		wcMain.hIcon			= MAIN_WINDOW_CLASS_ICON;
+		wcMain.hCursor			= MAIN_WINDOW_CLASS_CURSOR;
+		wcMain.hbrBackground	= MAIN_WINDOW_CLASS_BACKGROUND;
+		wcMain.lpszClassName	= MAIN_WINDOW_CLASS_NAME;
+		wcMain.hIconSm			= MAIN_WINDOW_CLASS_ICON;
+
+		// Register main window class
+		if( RegisterClassEx( &wcMain ) )
+		{
+			// Successfully registered main window class
+			HWND hWndMain;
+			DWORD dwWindowLeft;
+			DWORD dwWindowTop;
+			DWORD dwWindowWidth;
+			DWORD dwWindowHeight;
+			RegistryKey registryKey;
+
+			// Open registry key
+			if( registryKey.Open( REGISTRY_KEY, REGISTRY_SUB_KEY ) )
+			{
+				// Successfully opened registry key
+
+				// Get window position
+				dwWindowLeft	= registryKey.GetValue( REGISTRY_KEY_LEFT_VALUE_NAME,	CW_USEDEFAULT );
+				dwWindowTop		= registryKey.GetValue( REGISTRY_KEY_TOP_VALUE_NAME,	CW_USEDEFAULT );
+				dwWindowWidth	= registryKey.GetValue( REGISTRY_KEY_WIDTH_VALUE_NAME,	CW_USEDEFAULT );
+				dwWindowHeight	= registryKey.GetValue( REGISTRY_KEY_HEIGHT_VALUE_NAME,	CW_USEDEFAULT );
+
+				// Close registry key
+				registryKey.Close();
+
+			} // End of successfully opened registry key
+			else
+			{
+				// Unable to open registry key
+
+				// Use default window positions
+				dwWindowLeft	= CW_USEDEFAULT;
+				dwWindowTop		= CW_USEDEFAULT;
+				dwWindowWidth	= CW_USEDEFAULT;
+				dwWindowHeight	= CW_USEDEFAULT;
+
+			} // End of unable to open registry key
+
+			// Create main window
+			hWndMain = CreateWindowEx( MAIN_WINDOW_EXTENDED_STYLE, MAIN_WINDOW_CLASS_NAME, MAIN_WINDOW_TEXT, MAIN_WINDOW_STYLE, dwWindowLeft, dwWindowTop, dwWindowWidth, dwWindowHeight, NULL, NULL, hInstance, NULL );
+
+			// Ensure that main window was created
+			if( hWndMain )
+			{
+				// Successfully created main window
+
+				// Show main window
+				ShowWindow( hWndMain, nCmdShow );
+
+				// Update main window
+				UpdateWindow( hWndMain );
+
+				// Message loop
+				while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
+				{
+					// Translate message
+					TranslateMessage( &msg );
+
+					// Dispatch message
+					DispatchMessage( &msg );
+
+				}; // End of message loop
+
+			} // End of successfully created main window
+			else
+			{
+				// Unable to create main window
+
+				// Display error message
+				MessageBox( NULL, UNABLE_TO_CREATE_MAIN_WINDOW_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+
+			} // End of unable to create main window
+
+		} // End of successfully registered main window class
+		else
+		{
+			// Unable to register main window class
+
+			// Display error message
+			MessageBox( NULL, UNABLE_TO_REGISTER_MAIN_WINDOW_CLASS_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+
+		} // End of unable to register main window class
+
+	} // End of unable to find existing instance of window
 
 	return msg.wParam;
 
