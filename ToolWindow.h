@@ -7,6 +7,8 @@
 
 #include "Resource.h"
 
+#include "ControlWindow.h"
+
 #include "RegistryKeyClass.h"
 
 #define MAIN_WINDOW_CLASS_NAME													"Main ToolWindow Window Class"

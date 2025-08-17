@@ -2,31 +2,6 @@
 
 #include "ToolWindow.h"
 
-int ShowAboutMessage( HWND hWndParent )
-{
-	int nResult = 0;
-
-	MSGBOXPARAMS mbp;
-
-	// Clear message box parameter structure
-	ZeroMemory( &mbp, sizeof( mbp ) );
-
-	// Initialise message box parameter structure
-	mbp.cbSize		= sizeof( MSGBOXPARAMS );
-	mbp.hwndOwner	= hWndParent;
-	mbp.hInstance	= GetModuleHandle( NULL );
-	mbp.lpszText	= ABOUT_MESSAGE_TEXT;
-	mbp.lpszCaption	= ABOUT_MESSAGE_CAPTION;
-	mbp.dwStyle		= ( MB_OK | MB_USERICON );
-	mbp.lpszIcon	= MAIN_WINDOW_CLASS_ICON_NAME;
-
-	// Show message box
-	nResult = MessageBoxIndirect( &mbp );
-
-	return nResult;
-
-} // End of function ShowAboutMessage
-
 LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARAM lParam )
 {
 	LRESULT lr = 0;
@@ -34,10 +9,48 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 	// Select message
 	switch( uMessage )
 	{
+		case WM_CREATE:
+		{
+			// A create message
+			HINSTANCE hInstance;
+
+			// Get instance handle
+			hInstance = ( ( ( LPCREATESTRUCT )lParam )->hInstance );
+
+			// Create control window
+			if( ControlWindowCreate( hWndMain, hInstance ) )
+			{
+				// Successfully created control window
+			} // End of successfully created control window
+
+			// Break out of switch
+			break;
+
+		} // End of a create message
+		case WM_ACTIVATE:
+		{
+			// An activate message
+
+			// Focus on control window
+			ControlWindowSetFocus();
+
+			// Break out of switch
+			break;
+
+		} // End of an activate message
 		case WM_SIZE:
 		{
 			// A size message
 			RegistryKey registryKey;
+			DWORD dwClientWidth;
+			DWORD dwClientHeight;
+
+			// Store client size
+			dwClientWidth	= LOWORD( lParam );
+			dwClientHeight	= HIWORD( lParam );
+
+			// Move control window to fit client
+			ControlWindowMove( 0, 0, dwClientWidth, dwClientHeight, TRUE );
 
 			// Create registry key
 			if( registryKey.Create( REGISTRY_KEY, REGISTRY_SUB_KEY ) )
@@ -107,7 +120,6 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 
 					// Show about message
 					MessageBox( hWndMain, ABOUT_MESSAGE_TEXT, ABOUT_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
-					//ShowAboutMessage( hWndMain );
 
 					// Break out of switch
 					break;
@@ -117,8 +129,30 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 				{
 					// Default command
 
-					// Call default procedure
-					lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
+					// See if command message is from control window
+					if( IsControlWindow( ( HWND )lParam ) )
+					{
+						// Command message is from control window
+
+						// Handle command message from control window
+						if( !( ControlWindowHandleCommandMessage( wParam, lParam ) ) )
+						{
+							// Command message was not handled from control window
+
+							// Call default procedure
+							lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
+
+						} // End of command message was not handled from control window
+
+					} // End of command message is from control window
+					else
+					{
+						// Command message is not from control window
+
+						// Call default procedure
+						lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
+
+					} // End of command message is not from control window
 
 					// Break out of switch
 					break;
@@ -131,6 +165,44 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 			break;
 
 		} // End of a command message
+		case WM_NOTIFY:
+		{
+			// A notify message
+			LPNMHDR lpNmHdr;
+
+			// Get notify message handler
+			lpNmHdr = ( LPNMHDR )lParam;
+
+			// See if notify message is from control window
+			if( IsControlWindow( lpNmHdr->hwndFrom ) )
+			{
+				// Notify message is from control window
+
+				// Handle notify message from control window
+				if( !( ControlWindowHandleNotifyMessage( wParam, lParam ) ) )
+				{
+					// Notify message was not handled from control window
+
+					// Call default procedure
+					lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
+
+				} // End of notify message was not handled from control window
+
+			} // End of notify message is from control window
+			else
+			{
+				// Notify message is not from control window
+
+				// Call default procedure
+				lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
+
+			} // End of notify message is not from control window
+
+
+			// Break out of switch
+			break;
+
+		} // End of a notify message
 		case WM_CONTEXTMENU:
 		{
 			// A context menu message
