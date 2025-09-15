@@ -28,13 +28,13 @@
 #define MAIN_WINDOW_MINIMUM_HEIGHT												200
 
 #define REGISTRY_KEY															HKEY_CURRENT_USER
-#define REGISTRY_SUB_KEY														"Software\\Jim Smith\\Shortcut"
+#define REGISTRY_SUB_KEY														"Software\\Jim Smith\\ToolWindow"
 
 #define ABOUT_MESSAGE_TEXT														"ToolWindow\r\n"					\
 																				"\r\n"								\
 																				"Written by Jim Smith\r\n"			\
 																				"\r\n"								\
-																				"August 2025"
+																				"September 2025"
 
 #define UNABLE_TO_REGISTER_MAIN_WINDOW_CLASS_ERROR_MESSAGE						"Unable to Register Main Window Class"
 #define UNABLE_TO_CREATE_MAIN_WINDOW_ERROR_MESSAGE								"Unable to Create Main Window"
